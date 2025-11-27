@@ -1,15 +1,24 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import subprocess
-import tempfile
 import uuid
 
 app = FastAPI()
 
+# CORS 설정
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://pythonsubject.o-r.kr"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 class CodeRequest(BaseModel):
     code: str
 
-@app.post("/run")
+@app.post("/")
 def run_code(req: CodeRequest):
     tmp_filename = f"/tmp/{uuid.uuid4()}.py"
 
@@ -33,6 +42,6 @@ def run_code(req: CodeRequest):
     except subprocess.TimeoutExpired:
         return {
             "stdout": "",
-            "stderr": "❗ 실행 시간이 너무 길어 종료되었습니다.",
+            "stderr": "❗ 실행 시간이 너무 깁니다.",
             "returncode": -1
         }
